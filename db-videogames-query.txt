@@ -203,6 +203,35 @@ and t.`year` = 2019
 
 
 
+-- ***********************BONUS**********************************
+
+-- 10- Selezionare i dati della prima software house che ha rilasciato un gioco, assieme ai dati del gioco stesso (software house id : 5)
+select v.release_date , sh.*
+from videogames v
+join software_houses sh on sh.id = v.software_house_id 
+group by v.id 
+order by v.release_date asc 
+limit 1
+
+-- 11- Selezionare i dati del videogame (id, name, release_date, totale recensioni) con più recensioni (videogame id : potrebbe uscire 449 o 398, sono entrambi a 20)
+select count(*)as total_reviews, v.*
+from videogames v
+join reviews r on r.videogame_id = v.id 
+group by r.videogame_id 
+order by total_reviews desc 
+limit 1
+
+-- 12- Selezionare la software house che ha vinto più premi tra il 2015 e il 2016 (software house id : potrebbe uscire 3 o 1, sono entrambi a 3)
+select count(a.id) as num_award , sh.* 
+from software_houses sh
+join videogames v on v.software_house_id = sh.id 
+join award_videogame av on av.videogame_id = v.id 
+join awards a on a.id = av.award_id
+where av.`year` between 2015 and 2016
+group by sh.id, sh.name 
+order by count(a.id) desc
+limit 1
+
 
 
 
