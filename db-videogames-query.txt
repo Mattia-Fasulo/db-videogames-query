@@ -113,3 +113,97 @@ select r.videogame_id , avg(r.rating)
 from reviews r 
 group by r.videogame_id 
 order by avg(r.rating) desc;
+
+
+
+
+-- --------------------------------------JOIN--------------------------------------------
+
+-- 1- Selezionare i dati di tutti giocatori che hanno scritto almeno una recensione, mostrandoli una sola volta (996)
+select distinct p.id
+from players p 
+join reviews r on p.id = r.player_id 
+
+
+-- 2- Sezionare tutti i videogame dei tornei tenuti nel 2016, mostrandoli una sola volta (226)
+select distinct v.id 
+from videogames v 
+join tournament_videogame tv on v.id = tv.videogame_id 
+join tournaments t on tv.tournament_id = t.id 
+where t.`year`  = 2016;
+
+
+-- 3- Mostrare le categorie di ogni videogioco (1718)
+select v.id as 'id_games' , c.name as 'category'
+from categories c 
+join category_videogame cv on c.id = cv.category_id 
+join videogames v on cv.videogame_id = v.id 
+
+
+-- 4- Selezionare i dati di tutte le software house che hanno rilasciato almeno un gioco dopo il 2020, mostrandoli una sola volta (6)
+select distinct sh.id as 'software_house_id', count(v.id) as 'num_videogames'
+from software_houses sh 
+join videogames v on sh.id = v.software_house_id 
+where year(v.release_date) > 2020
+group by sh.id;
+
+
+-- 5- Selezionare i premi ricevuti da ogni software house per i videogiochi che ha prodotto (55)
+select sh.name as 'software_house' , a.name "award", av.`year` 
+from software_houses sh 
+join videogames v on sh.id = v.software_house_id 
+join award_videogame av on v.id = av.videogame_id 
+join awards a on av.award_id = a.id 
+
+
+-- 6- Selezionare categorie e classificazioni PEGI dei videogiochi che hanno ricevuto recensioni da 4 e 5 stelle, mostrandole una sola volta (3363)
+select distinct v.id as 'videogame_id', c.name as 'category' , pl.name as "PEGI" 
+from videogames v
+join category_videogame cv on v.id = cv.videogame_id 
+join categories c on cv.category_id = c.id 
+join pegi_label_videogame plv on v.id = plv.videogame_id 
+join pegi_labels pl on plv.pegi_label_id = pl.id 
+join reviews r on v.id = r.videogame_id 
+where r.rating >= 4
+
+
+-- 7- Selezionare quali giochi erano presenti nei tornei nei quali hanno partecipato i giocatori il cui nome inizia per 'S' (474)
+select distinct v.id  
+from tournaments t 
+join player_tournament pt on t.id = pt.tournament_id 
+join players p on pt.player_id = p.id 
+join tournament_videogame tv on t.id = tv.tournament_id 
+join videogames v on tv.videogame_id = v.id 
+where p.name like "S%"
+
+
+-- 8- Selezionare le città in cui è stato giocato il gioco dell'anno del 2018 (36)
+select  t.city 
+from tournaments t 
+join tournament_videogame tv on t.id = tv.tournament_id  
+join videogames v on v.id = tv.videogame_id 
+join award_videogame av on v.id = av.videogame_id 
+join awards a on av.award_id = a.id 
+where av.award_id  = 1 and av.`year` = 2018
+
+
+
+-- 9- Selezionare i giocatori che hanno giocato al gioco più atteso del 2018 in un torneo del 2019 (3306)
+select p.*
+from players p 
+join player_tournament pt on pt.player_id = p.id 
+join tournaments t on t.id =pt.tournament_id
+join tournament_videogame tv on tv.tournament_id = t.id
+join videogames v on v.id = tv.videogame_id 
+join award_videogame av on av.videogame_id = v.id 
+join awards a on a.id = av.award_id
+where av.`year` = '2018'
+and av.award_id = 5
+and t.`year` = 2019
+
+
+
+
+
+
+
